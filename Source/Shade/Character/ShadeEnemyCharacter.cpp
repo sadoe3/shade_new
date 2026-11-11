@@ -1,6 +1,7 @@
 #include "ShadeEnemyCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "../AI/ShadeAwarenessComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "../AbilitySystem/Data/ShadeInitialAttributesData.h"
 #include "../AbilitySystem/ShadeAttributeSet.h"
@@ -17,6 +18,7 @@ AShadeEnemyCharacter::AShadeEnemyCharacter()
     OwnedAbilitySystem->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
     AttributeSet = CreateDefaultSubobject<UShadeAttributeSet>(TEXT("AttributeSet"));
     AwarenessSet = CreateDefaultSubobject<UShadeAwarenessSet>(TEXT("AwarenessSet"));
+    AwarenessComponent = CreateDefaultSubobject<UShadeAwarenessComponent>(TEXT("AwarenessComponent"));
 
     bUseControllerRotationPitch = false;
     bUseControllerRotationYaw = false;
@@ -98,7 +100,12 @@ void AShadeEnemyCharacter::InitializeAbilitySystem()
 
 void AShadeEnemyCharacter::InitializeAwareness()
 {
-    if (bAwarenessInitialized) return;
+    if (bAwarenessInitialized)
+    {
+        // Reconnect after an explicit shutdown without reapplying initial attribute data.
+        AwarenessComponent->Initialize(OwnedAbilitySystem);
+        return;
+    }
     if (!IsValid(BehaviorData))
     {
         UE_LOG(LogTemp, Error, TEXT("%s: Enemy BehaviorData must be assigned."), *GetName());
@@ -114,4 +121,5 @@ void AShadeEnemyCharacter::InitializeAwareness()
     if (!ensure(Spec.IsValid())) return;
     Spec.Data->SetSetByCallerMagnitude(ShadeGameplayTags::Data_Awareness_Maximum, BehaviorData->MaxAlertness);
     bAwarenessInitialized = OwnedAbilitySystem->ApplyGameplayEffectSpecToSelf(*Spec.Data.Get()).WasSuccessfullyApplied();
+    if (bAwarenessInitialized) AwarenessComponent->Initialize(OwnedAbilitySystem);
 }

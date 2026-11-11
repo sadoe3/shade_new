@@ -95,6 +95,7 @@ bool FShadeEnemyAwarenessTrendTest::RunTest(const FString& Parameters)
         case 0:
             if (State->Elapsed < 0.7f) return false;
             TestEqual(TEXT("Positive periodic delta reaches upper bound"), Attributes->GetAlertness(), 100.f);
+            TestTrue(TEXT("Periodic gain drives Alert state"), ASC->HasMatchingGameplayTag(ShadeGameplayTags::State_Awareness_Alert));
             TestEqual(TEXT("Other Enemy does not change"), State->Second->GetAwarenessSet()->GetAlertness(), 0.f);
             ASC->RemoveActiveGameplayEffect(State->TrendHandle);
             ASC->SetNumericAttributeBase(UShadeAwarenessSet::GetAlertnessAttribute(), 50.f);
@@ -104,6 +105,7 @@ bool FShadeEnemyAwarenessTrendTest::RunTest(const FString& Parameters)
         case 1:
             if (State->Elapsed < 0.3f) return false;
             TestEqual(TEXT("Removed gain effect stops future executions"), Attributes->GetAlertness(), 50.f);
+            TestTrue(TEXT("Intermediate value drives Suspicious state"), ASC->HasMatchingGameplayTag(ShadeGameplayTags::State_Awareness_Suspicious));
             {
                 auto Spec = ASC->MakeOutgoingSpec(UShadeAlertnessTrendEffect::StaticClass(), 1.f, ASC->MakeEffectContext());
                 if (!TestTrue(TEXT("Decay spec exists"), Spec.IsValid())) return true;
@@ -116,6 +118,7 @@ bool FShadeEnemyAwarenessTrendTest::RunTest(const FString& Parameters)
         case 2:
             if (State->Elapsed < 0.5f) return false;
             TestEqual(TEXT("Negative periodic delta reaches zero"), Attributes->GetAlertness(), 0.f);
+            TestTrue(TEXT("Periodic decay restores Calm state"), ASC->HasMatchingGameplayTag(ShadeGameplayTags::State_Awareness_Calm));
             TestEqual(TEXT("Base value also remains bounded"), Attributes->Alertness.GetBaseValue(), 0.f);
             ASC->RemoveActiveGameplayEffect(State->TrendHandle);
             State->StoppedValue = Attributes->GetAlertness();
@@ -125,7 +128,7 @@ bool FShadeEnemyAwarenessTrendTest::RunTest(const FString& Parameters)
         case 3:
             if (State->Elapsed < 0.3f) return false;
             TestEqual(TEXT("Removal does not undo previous periodic changes"), Attributes->GetAlertness(), State->StoppedValue);
-            TestEqual(TEXT("No trend effect remains"), ASC->GetActiveEffects(FGameplayEffectQuery()).Num(), 0);
+            TestEqual(TEXT("Only the observer state effect remains"), ASC->GetActiveEffects(FGameplayEffectQuery()).Num(), 1);
             return true;
         }
         return true;
