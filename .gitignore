@@ -1,0 +1,46 @@
+# Unreal generated output and local backups
+/Binaries/
+/DerivedDataCache/
+/Intermediate/
+/Saved/
+/Backup/
+/Plugins/**/Intermediate/
+/Plugins/**/Saved/
+/Plugins/**/DerivedDataCache/
+# Keep plugin binaries visible: binary-only plugins may require them.
+# Keep Build/, Content/ (including External Actors), Config/, and Source/.
+
+# Rider / JetBrains local project model and personal settings
+.idea/
+_ReSharper*/
+*.DotSettings.user
+
+# Generated IDE projects and Visual Studio local state
+.vs/
+.vscode/
+.vsconfig
+*.sln
+*.slnx
+*.suo
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.VC.db
+*.VC.opendb
+*.opensdf
+*.sdf
+*.xcodeproj/
+*.xcworkspace/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Personal maps and their World Partition external packages stay local.
+/Content/Developers/
+/Content/__ExternalActors__/Developers/
+/Content/__ExternalObjects__/Developers/
+
+# Per-machine Engine overrides, including local Android File Server credentials.
+/Config/UserEngine.ini
